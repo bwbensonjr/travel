@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Day {{ d.day }}: {{ d.title }} | {{ trip.title }}{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ root }}static/day.css">{% endblock %}
+{% block body_class %}day-page{% endblock %}
+{% block header %}
+<a class="brand" href="../../">{{ trip.title }}</a>
+{% endblock %}
+{% macro daynav(cls) %}
+<nav class="day-nav {{ cls }}" aria-label="Days">
+  {% if d.prev_day %}<a class="btn" href="../{{ d.prev_day }}/" rel="prev">&larr; Day {{ d.prev_day }}</a>{% else %}<span></span>{% endif %}
+  <a class="btn" href="../../">Map</a>
+  {% if d.next_day %}<a class="btn" href="../{{ d.next_day }}/" rel="next">Day {{ d.next_day }} &rarr;</a>{% else %}<span></span>{% endif %}
+</nav>
+{% endmacro %}
+{% block content %}
+{{ daynav("top") }}
+
+<section class="day-summary" aria-labelledby="day-title">
+  <div class="day-kicker">Day {{ d.day }} · {{ d.date }}</div>
+  <h1 id="day-title">{{ d.title }}</h1>
+  {% for s in d.stops if not s.is_sea %}
+  <div class="stop-line">
+    {% if d.stops|length > 1 %}<span class="stop-name">{{ s.short_name }}</span>{% endif %}
+    {% if s.arrive or s.depart %}
+    <span class="times">
+      {% if s.arrive %}<span><span class="muted">Arrive</span> <strong>{{ s.arrive }}</strong></span>{% endif %}
+      {% if s.depart %}<span><span class="muted">Depart</span> <strong>{{ s.depart }}</strong></span>{% endif %}
+    </span>
+    {% endif %}
+    {% if s.flags %}
+    <span class="flags">{% for f in s.flags %}<span class="badge{% if 'Tender' in f or 'Visa' in f %} warn{% endif %}">{{ f }}</span>{% endfor %}</span>
+    {% endif %}
+  </div>
+  {% endfor %}
+  {% if d.is_sea %}<p class="muted">A full day at sea, with no port call.</p>{% endif %}
+</section>
+
+{% for s in d.stops if not s.is_sea %}
+<section class="stop" aria-labelledby="stop-{{ loop.index }}">
+  {% if d.stops|length > 1 %}<h2 id="stop-{{ loop.index }}" class="stop-heading">{{ s.name }}</h2>{% else %}<h2 id="stop-{{ loop.index }}" class="visually-hidden">{{ s.name }}</h2>{% endif %}
+  {% if s.about_html %}<div class="prose about">{{ s.about_html }}</div>{% endif %}
+
+  {% if s.excursions %}
+  <h3 class="section-title">Shore excursions <span class="count">{{ s.excursions|length }}</span></h3>
+  <ul class="list-plain excursions">
+    {% for e in s.excursions %}
+    <li>
+      <details class="exc" id="exc-{{ e.id }}">
+        <summary>
+          <span class="exc-title">{{ e.title }}</span>
+          <span class="exc-meta">{{ e.summary }}</span>
+        </summary>
+        <div class="exc-body">
+          <table class="facts">
+            {% for label, value in e.facts %}<tr><th scope="row">{{ label }}</th><td>{{ value }}</td></tr>{% endfor %}
+          </table>
+          <div class="prose">{{ e.description_html }}</div>
+          <p class="exc-links">
+            <a href="{{ e.url }}" target="_blank" rel="noopener">Holland America page</a>
+            <a href="#exc-{{ e.id }}" class="muted small exc-permalink">Link to this excursion</a>
+          </p>
+        </div>
+      </details>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if s.place_groups %}
+  <details class="places">
+    <summary class="section-title">Places <span class="count">{{ s.place_count }}</span></summary>
+    {% for g in s.place_groups %}
+    <div class="place-group">
+      <h4><span class="dot" style="background: var(--cat-{{ g.key }})"></span>{{ g.label }}</h4>
+      <ul class="list-plain place-list">
+        {% for p in g.places %}
+        <li>
+          <a href="../../?place={{ p.id }}">{{ p.name }}</a>
+          {% if p.location_check != "verified" %}<span class="muted small">approx.</span>{% endif %}
+          {% if p.note %}<span class="muted small">{{ p.note }}</span>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </details>
+  {% endif %}
+</section>
+{% endfor %}
+
+{% if d.notes %}
+<section class="notes" aria-labelledby="notes-title">
+  <h2 id="notes-title">Notes</h2>
+  {% for n in d.notes %}
+  <div class="note">
+    <h3>{{ n.title }}</h3>
+    <div class="prose">{{ n.html }}</div>
+  </div>
+  {% endfor %}
+</section>
+{% endif %}
+
+{{ daynav("bottom") }}
+{% endblock %}
+{% block scripts %}<script src="{{ root }}static/day.js" defer></script>{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ site_title }}</h1>
+<ul class="list-plain trip-list" style="margin-top: var(--space-4)">
+  {% for trip in trips %}
+  <li>
+    <a href="{{ trip.slug }}/">
+      <div class="card">
+        <div class="title">{{ trip.title }}</div>
+        <div class="muted small">{{ trip.dates }}{% if trip.subtitle %} · {{ trip.subtitle }}{% endif %}</div>
+      </div>
+    </a>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

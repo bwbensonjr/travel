@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}{{ trip.title }}{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{{ root }}static/vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="{{ root }}static/map.css">
+{% endblock %}
+{% block body_class %}map-page{% endblock %}
+{% block header %}
+<a class="brand" href="{{ root }}">{{ trip.title }}</a>
+{% endblock %}
+{% block body %}
+<main id="main" class="map-app">
+  <div class="map-wrap">
+    <div id="map" role="region" aria-label="Cruise map"></div>
+    <div id="map-offline" class="map-offline" hidden>
+      <strong>Map needs a connection.</strong>
+      <span>Day pages below work offline.</span>
+    </div>
+  </div>
+  <aside class="sidebar" id="sidebar" aria-label="Days and filters">
+    <div class="sidebar-head">
+      <div>
+        <div class="trip-dates">{{ trip.dates }}</div>
+        <div class="muted small" id="match-count" aria-live="polite"></div>
+      </div>
+      <button class="btn sidebar-toggle" id="sidebar-toggle" type="button" aria-expanded="true" aria-controls="sidebar-body">Hide</button>
+    </div>
+    <div class="sidebar-body" id="sidebar-body">
+      <section class="side-section">
+        <label class="visually-hidden" for="search">Search places and excursions</label>
+        <input type="search" id="search" class="search" placeholder="Search places and excursions" autocomplete="off">
+      </section>
+
+      <section class="side-section" aria-labelledby="days-title">
+        <h2 id="days-title" class="side-title">Days</h2>
+        <ol class="list-plain day-list" id="day-list">
+          <li class="day-row" data-day="all">
+            <button type="button" class="day-select" aria-pressed="true">
+              <span class="day-num">All</span>
+              <span class="day-port">Whole voyage</span>
+              <span class="day-meta">{{ trip.dates }}</span>
+            </button>
+          </li>
+          {% for d in days %}
+          <li class="day-row" data-day="{{ d.day }}">
+            <button type="button" class="day-select" aria-pressed="false">
+              <span class="day-num">{{ d.day }}</span>
+              <span class="day-port">{{ d.title }}</span>
+              <span class="day-meta">{{ d.date }}{% set s = d.stops[0] %}{% if s.arrive or s.depart %} · {{ s.arrive }}{% if s.arrive and s.depart %}&ndash;{% endif %}{{ s.depart }}{% endif %}</span>
+            </button>
+            <a class="day-link" href="day/{{ d.day }}/" aria-label="Day {{ d.day }} details">Details</a>
+          </li>
+          {% endfor %}
+        </ol>
+      </section>
+
+      <details class="side-section filters" id="filters">
+        <summary class="side-title">Filters</summary>
+        <div class="filter-block">
+          <div class="filter-label">Place types</div>
+          <div class="chips" id="category-chips"></div>
+          <label class="check"><input type="checkbox" id="f-passby" checked> Include places seen in passing</label>
+        </div>
+        <div class="filter-block" id="price-block">
+          <label class="filter-label" for="f-price">Max excursion price <span id="price-label"></span></label>
+          <input type="range" id="f-price" min="0" step="10">
+        </div>
+        <div class="filter-block" id="level-block">
+          <div class="filter-label">Activity level</div>
+          <div class="chips" id="level-chips"></div>
+        </div>
+        <div class="filter-block" id="wheelchair-block">
+          <label class="check"><input type="checkbox" id="f-wheelchair"> Wheelchair accessible only</label>
+        </div>
+        <div class="filter-block">
+          <label class="check"><input type="checkbox" id="f-noexc" checked> Include places without excursions</label>
+        </div>
+        <button class="btn" id="f-reset" type="button">Reset filters</button>
+      </details>
+    </div>
+  </aside>
+</main>
+{% endblock %}
+{% block scripts %}
+<script src="{{ root }}static/vendor/leaflet/leaflet.js"></script>
+<script src="{{ root }}static/map.js"></script>
+{% endblock %}

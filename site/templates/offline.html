@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Offline | {{ site_title }}{% endblock %}
+{% block content %}
+<h1>Offline</h1>
+<p class="muted">That page isn't saved on this device. These are:</p>
+{% for t in trips %}
+<div class="card" style="margin-top: var(--space-4)">
+  <h2 style="font-size: var(--text-lg); margin-bottom: var(--space-2)"><a href="{{ root }}{{ t.config.slug }}/">{{ t.config.title }}</a></h2>
+  <ul class="list-plain">
+    {% for d in t.views %}
+    <li style="padding: var(--space-1) 0"><a href="{{ root }}{{ t.config.slug }}/day/{{ d.day }}/">Day {{ d.day }}: {{ d.title }}</a> <span class="muted small">{{ d.date }}</span></li>
+    {% endfor %}
+  </ul>
+</div>
+{% endfor %}
+{% endblock %}

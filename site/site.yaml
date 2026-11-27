@@ -1,0 +1,9 @@
+# Trips published on the site. Each entry becomes /<slug>/ on the site.
+# data_dir is relative to the repository root.
+title: "Family Travel"
+trips:
+  - slug: "2027-ireland"
+    title: "Wild British Isles: Ireland & Cliffs of Moher"
+    subtitle: "Zuiderdam, Amsterdam round trip"
+    dates: "June 22 to July 3, 2027"
+    data_dir: "2027-ireland"
