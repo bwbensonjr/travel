@@ -52,3 +52,5 @@ Times are local ship time as published by Holland America and subject to change.
 
 - Each `day-NN-*.md` file has YAML front matter (day, date, stops, port codes, arrive/depart, flags) followed by the port description and full shore excursion descriptions.
 - [excursions.csv](excursions.csv) lists every shore excursion with price, duration, activity level, accessibility, and source URL for sorting and filtering.
+- [map.html](map.html) is an interactive map of the route, ports, and places visited by the excursions. Open it in a browser; it needs an internet connection for the map tiles.
+- [places.geojson](places.geojson) holds the map data: the sea route, port calls, and places mentioned in the port and excursion descriptions, each tagged with its day and excursion IDs. Places whose coordinates could not be confirmed in OpenStreetMap have `"location_check": "approximate"`. After editing it, run `python3 scripts/build_map_data.py` to refresh `map-data.js`.
