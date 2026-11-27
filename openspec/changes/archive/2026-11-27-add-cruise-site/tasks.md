@@ -54,7 +54,7 @@
 
 - [x] 8.1 Remove `2027-ireland/map.html`, `map-data.js` and `scripts/build_map_data.py`, and update `2027-ireland/itinerary.md` and the root `README.md` to link to the site and the local build; verify no remaining references with `grep -r "map-data.js\|map.html"`
 - [x] 8.2 Full local check: serve `_site/`, then walk trip list to map to day page to excursion to back, in light and dark themes on phone and desktop widths, with no console errors
-- [ ] 8.3 After the repository owner completes the manual Pages setup, confirm the first workflow deploy succeeds and the public URL loads the trip map and a day page
+- [x] 8.3 After the repository owner completes the manual Pages setup, confirm the first workflow deploy succeeds and the public URL loads the trip map and a day page
 
 ## Workflow follow-up
 
