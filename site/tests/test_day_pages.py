@@ -91,3 +91,58 @@ def test_notes_rendered(repo_root, site_dir, tmp_path):
     html = (out / "t" / "day" / "3" / "index.html").read_text()
     assert '<h2 id="notes-title">Notes</h2>' in html
     assert "Our research" in html and "predates Stonehenge" in html
+
+
+def test_price_only_in_expanded_details(built):
+    html = page(built, 4)
+    metas = re.findall(r'<span class="exc-meta">([^<]*)</span>', html)
+    assert len(metas) == 18
+    assert not [m for m in metas if "$" in m]
+    causeway = html.split('<span class="exc-title">The Giant&#39;s Causeway</span>', 1)[1].split("</details>", 1)[0]
+    summary, body = causeway.split("</summary>", 1)
+    assert "$" not in summary
+    assert "6 Hours · Moderate" in summary
+    assert '<th scope="row">Starting at</th><td>$179</td>' in body
+
+
+def stop_sections(html):
+    return html.split('<section class="stop"')[1:]
+
+
+def test_day4_places_before_excursions(built):
+    html = page(built, 4)
+    about = html.index('class="prose about"')
+    places = html.index('<details class="places">')
+    excursions = html.index(">Shore excursions <")
+    assert about < places < excursions
+
+
+def test_day9_each_stop_orders_places_first(built):
+    galway, cliffs = stop_sections(page(built, 9))
+    assert "Galway, Ireland" in galway
+    assert galway.index('<details class="places">') < galway.index(">Shore excursions <")
+    assert "Scenic cruising Cliffs of Moher" in cliffs
+    assert '<details class="places">' in cliffs
+    assert "Shore excursions" not in cliffs
+
+
+def test_stop_without_places_shows_excursions_after_description(repo_root, site_dir, tmp_path):
+    import json
+
+    data = tmp_path / "trip"
+    shutil.copytree(repo_root / "2027-ireland", data,
+                    ignore=shutil.ignore_patterns("*.docx", "*.webp", "scripts"))
+    geo = data / "places.geojson"
+    fc = json.loads(geo.read_text())
+    fc["features"] = [f for f in fc["features"]
+                      if not (f["properties"]["kind"] == "place" and f["properties"]["day"] == 3)]
+    geo.write_text(json.dumps(fc))
+    site = tmp_path / "site"
+    shutil.copytree(site_dir, site, ignore=shutil.ignore_patterns("tests", "__pycache__"))
+    (site / "site.yaml").write_text("title: T\ntrips:\n  - {slug: t, title: T, dates: d, data_dir: trip}\n")
+    out = tmp_path / "out"
+    build(site, out, repo_root=tmp_path)
+    (stop,) = stop_sections((out / "t" / "day" / "3" / "index.html").read_text())
+    assert '<details class="places">' not in stop
+    between = stop.split('class="prose about"', 1)[1].split(">Shore excursions <", 1)[0]
+    assert "<details" not in between and "<h3" in between

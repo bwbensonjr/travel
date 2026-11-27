@@ -40,6 +40,26 @@
   {% if d.stops|length > 1 %}<h2 id="stop-{{ loop.index }}" class="stop-heading">{{ s.name }}</h2>{% else %}<h2 id="stop-{{ loop.index }}" class="visually-hidden">{{ s.name }}</h2>{% endif %}
   {% if s.about_html %}<div class="prose about">{{ s.about_html }}</div>{% endif %}
 
+  {% if s.place_groups %}
+  <details class="places">
+    <summary class="section-title">Places <span class="count">{{ s.place_count }}</span></summary>
+    {% for g in s.place_groups %}
+    <div class="place-group">
+      <h4><span class="dot" style="background: var(--cat-{{ g.key }})"></span>{{ g.label }}</h4>
+      <ul class="list-plain place-list">
+        {% for p in g.places %}
+        <li>
+          <a href="../../?place={{ p.id }}">{{ p.name }}</a>
+          {% if p.location_check != "verified" %}<span class="muted small">approx.</span>{% endif %}
+          {% if p.note %}<span class="muted small">{{ p.note }}</span>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </details>
+  {% endif %}
+
   {% if s.excursions %}
   <h3 class="section-title">Shore excursions <span class="count">{{ s.excursions|length }}</span></h3>
   <ul class="list-plain excursions">
@@ -64,26 +84,6 @@
     </li>
     {% endfor %}
   </ul>
-  {% endif %}
-
-  {% if s.place_groups %}
-  <details class="places">
-    <summary class="section-title">Places <span class="count">{{ s.place_count }}</span></summary>
-    {% for g in s.place_groups %}
-    <div class="place-group">
-      <h4><span class="dot" style="background: var(--cat-{{ g.key }})"></span>{{ g.label }}</h4>
-      <ul class="list-plain place-list">
-        {% for p in g.places %}
-        <li>
-          <a href="../../?place={{ p.id }}">{{ p.name }}</a>
-          {% if p.location_check != "verified" %}<span class="muted small">approx.</span>{% endif %}
-          {% if p.note %}<span class="muted small">{{ p.note }}</span>{% endif %}
-        </li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endfor %}
-  </details>
   {% endif %}
 </section>
 {% endfor %}

@@ -77,7 +77,8 @@ def merge_excursion(md_exc, csv_exc):
     rec["price_label"] = price_label(csv_exc["price"])
     rec["description_html"] = markdown_to_html(md_exc.description_md)
     rec["facts"] = [(label, rec[key]) for label, key in EXCURSION_FACTS if rec.get(key)]
-    rec["summary"] = " · ".join(x for x in (rec["price_label"], rec["duration"], rec["activity_level"]) if x)
+    # The collapsed row omits price on purpose; it appears in the expanded facts ("Starting at").
+    rec["summary"] = " · ".join(x for x in (rec["duration"], rec["activity_level"]) if x)
     return rec
 
 
